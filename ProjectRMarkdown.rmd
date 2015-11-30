@@ -6,7 +6,7 @@ Statistical Analysis from Crime Data of Seattle, Summer 2014 - Ravi R
 ---------------------
 ## Finding
 
-Robberies increase at night during summer months in Seattle
+Robberies increased at night during summer months in Seattle in 2014 & most offense types in the evening were "Theft - Carprowl"
 
 
 ## Overview and Objectives
@@ -21,7 +21,9 @@ This is a small data analysis conducted on the Seattle Crime Data of summer 2014
 
 ###Getting the data ready
 
-We first sort out the data to convert the date to the right format and then add a column for hour (0-23 hrs) so that we can find out the trends in the day. We then include only the fields for Offense type and Hour of the day as we aren't interested in any other fields. Finally we summarize it by the Offense type to get a frequency of each of the offense type in every hour. The following code achieves it:
+We first sort out the data to convert the date to the right format and then add a column for hour (0-23 hrs) so that we can find out the trends in the day. We then include only the fields for Offense type and Hour of the day as we aren't interested in any other fields. 
+
+Finally we summarize it by the Offense type to get a frequency of each of the offense type in every hour. The following code achieves it:
 
 
 
@@ -49,12 +51,14 @@ summary <- ddply(df_new, c("Offense.Type", "hour_of_crime"), summarize, freq=len
 
 ### Data Analytics and Conclusions
 
+For the purpose of visualiztion, we categorize the hour of crime as ordinal (since it has an importance of order), frequency or number of crimes per offense type as numeric and the offense type as nominal data (portrayed as different colors) for the visualization.
+
 
 For each of the questions that we would like to answer we do the analytics and the conclusion in this section.
 
 With the code in hand we now plot a graph to see the overall trend and in particular find out which incidents are most frequent in the evenings. 
 
-Since the data has lot of points and identifying by color is not that easy we label the points that we are interested in. Based on the trends We keep a threshold of 450 for the # of crimes (that it we'll label only those Offense types having over above 450 for a given hour). A more detailed graph (which cannot fit in this html document & which has a higher resolution and fits almost all crime types is available as plot.png in the repository - can be viewed on a larger monitor)
+Since the data has lot of points and identifying by color is not that easy we label the points that we are interested in. Based on the trends We keep a threshold of 450 for the # of crimes (we'll label only those Offense types having over 450 for a given hour). Few of the legend items are not visible in this but the information which we mainly want is - a more detailed graph (which cannot fit in this document & which has a higher resolution and fits almost all crime types is available as plot.png in the same repository https://github.com/rravishankar/uow_assignment6/blob/master/plot.png - this file can be viewed separately maybe on a larger monitor to get the big picture)
 
 
 ```{r}
@@ -66,10 +70,10 @@ ggplot(summary, aes(x=hour_of_crime, y=freq, color=Offense.Type), height=960, wi
 
 ```
 
-Based on the graph, we can conculde that "Theft-Carprowl" as the most frequent crime in the evening.
+Based on the graph, we can conculde that "Theft-Carprowl" as the most frequent offense type in the evening.
 
 
-Finally let's look at the trend for robberies. For this we filter the Offense type for words containing the text "ROBBERY" (which includes many categories of robberies) and we plot the 
+Finally let's look at the trend for robberies. For this we filter the Offense type for words containing the text "ROBBERY" (which includes many categories of robberies) and we plot the graph of robbery over the whole day
 
 ```{r}
 
@@ -80,6 +84,10 @@ ggplot(summary_subset, aes(x=hour_of_crime, y=freq, color=Offense.Type))+ geom_p
 ```
 
 From the graph we can conclude that robberies pick up after about 2000hrs(or 8PM) and continue to be high around till about 5AM.
+
+### Data Visualization Conclusion
+
+The graph visualzations make it easy to observe the trends in the data. It is clear from the visualizations that in Seattle Summer 2014, Theft CarProwl was the most frequently committed offense and robberies were predominant at night.
 
 
 
