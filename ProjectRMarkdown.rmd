@@ -1,0 +1,85 @@
+---
+output: html_document
+---
+Statistical Analysis from Crime Data of Seattle, Summer 2014 - Ravi R
+---------------------
+---------------------
+## Finding
+
+Robberies increase at night during summer months in Seattle
+
+
+## Overview and Objectives
+
+This is a small data analysis conducted on the Seattle Crime Data of summer 2014. Some of the areas that we take a glimpse of and get some answers for questions are :
+
+- which incidents are most frequent in the evening & how incidents vary by the time of the day
+- during what periods of the day are robberies most common
+
+## Analysis and code
+
+
+###Getting the data ready
+
+We first sort out the data to convert the date to the right format and then add a column for hour (0-23 hrs) so that we can find out the trends in the day. We then include only the fields for Offense type and Hour of the day as we aren't interested in any other fields. Finally we summarize it by the Offense type to get a frequency of each of the offense type in every hour. The following code achieves it:
+
+
+
+```{r}
+df <- read.csv("seattle_summer.csv")
+library(ggplot2)
+dtimes <- df$Occurred.Date.or.Date.Range.Start
+x <- strptime(dtimes, format="%m/%d/%Y %I:%M:%S %p")
+hour <- x$hour #hour of the crime
+df$hour_of_crime <- hour
+library(plyr)
+df_new <- df[ , which(names(df) %in% c("Offense.Type","hour_of_crime"))]
+summary <- ddply(df_new, c("Offense.Type", "hour_of_crime"), summarize, freq=length(hour_of_crime))
+#Just check if the data has been got correctly for one of the categories
+#summary[summary$Offense.Type=="THREATS-OTHER",]
+#Well we have for all the 24 hours 0-23 !
+#Now to plot the
+
+#ggplot(summary, aes(x=Offense.Type, y=freq, color=hour_of_crime))+geom_point()
+
+#ggplot(summary, aes(x=hour_of_crime, y=freq, color=Offense.Type))+geom_point()
+
+
+```
+
+### Data Analytics and Conclusions
+
+
+For each of the questions that we would like to answer we do the analytics and the conclusion in this section.
+
+With the code in hand we now plot a graph to see the overall trend and in particular find out which incidents are most frequent in the evenings. 
+
+Since the data has lot of points and identifying by color is not that easy we label the points that we are interested in. Based on the trends We keep a threshold of 450 for the # of crimes (that it we'll label only those Offense types having over above 450 for a given hour). A more detailed graph (which cannot fit in this html document & which has a higher resolution and fits almost all crime types is available as plot.png in the repository - can be viewed on a larger monitor)
+
+
+```{r}
+#png("plot.png", width=12500, height=10000, res=300)
+
+
+ggplot(summary, aes(x=hour_of_crime, y=freq, color=Offense.Type), height=960, width=1200)+ geom_point() + geom_text(aes(label=ifelse(freq>450,as.character(Offense.Type),'')),hjust=1,just=-100, size=3) + xlab("Hour of the day") + ylab("Crime Frequency") + ggtitle("Top Offense &  plot of all crimes")
+#dev.off()
+
+```
+
+Based on the graph, we can conculde that "Theft-Carprowl" as the most frequent crime in the evening.
+
+
+Finally let's look at the trend for robberies. For this we filter the Offense type for words containing the text "ROBBERY" (which includes many categories of robberies) and we plot the 
+
+```{r}
+
+summary_subset <- summary[grep("ROBBERY", summary$Offense.Type),]
+
+ggplot(summary_subset, aes(x=hour_of_crime, y=freq, color=Offense.Type))+ geom_point() + geom_text(aes(label=ifelse(freq>450,as.character(Offense.Type),'')),hjust=1,just=-100, size=3) + xlab("Hour of the day") + ylab("Crime Frequency") + ggtitle("Robberies over the day")
+
+```
+
+From the graph we can conclude that robberies pick up after about 2000hrs(or 8PM) and continue to be high around till about 5AM.
+
+
+
